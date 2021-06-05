@@ -23,6 +23,7 @@ def read_udp(data, addr):
     global UDP_SEARCHING
     ip, port = addr
     if data[0:2] == "UC":
+        print("Broadcast data received from a mixer")
         # UC found, try to search the name
         start = data.find("\xb7")
         if start > -1:
@@ -34,9 +35,10 @@ def read_udp(data, addr):
             mixer_connect(ip, port)
 
 def mixer_connect(ip, port):
-    print("Trying to connect to %s" % ip)
+    print("Trying to connect to %s:%s" % (ip, port))
     tcp_sock = tcp_connect(ip, port)
-    tcp_sock.send("UC\x00\x01\x1e\x00\x4a\x4d\x68\x00\x65\x00\x14\x00\x00\x00\{\" id\": \"QuerySlave \"\}")
+    initstring = "\x00\x01\x1e\x00\x4a\x4d\x68\x00\x65\x00\x14\x00\x00\x00"
+    tcp_sock.send("UC" + initstring + "{\"id\": \"QuerySlave\"}")
     data = tcp_sock.recv(TCP_BUFFER)
     print(data)
     tcp_sock.close()
