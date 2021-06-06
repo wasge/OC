@@ -1,4 +1,5 @@
 import socket
+from packet_encode_decode import packet_encode
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 47809
@@ -23,7 +24,7 @@ def read_udp(data, addr):
     global UDP_SEARCHING
     ip, port = addr
     if data[0:2] == "UC":
-        print("Broadcast data received from a mixer")
+        print("Data received from a mixer")
         # UC found, try to search the name
         start = data.find("\xb7")
         if start > -1:
@@ -37,10 +38,19 @@ def read_udp(data, addr):
 def mixer_connect(ip, port):
     print("Trying to connect to %s:%s" % (ip, port))
     tcp_sock = tcp_connect(ip, port)
-    initstring = "\x00\x01\x1e\x00\x4a\x4d\x68\x00\x65\x00\x14\x00\x00\x00"
-    tcp_sock.send("UC" + initstring + "{\"id\": \"QuerySlave\"}")
+    packet = packet_encode("JM", "{\"id\": \"QuerySlave\"}")
+    tcp_sock.send(packet)
     data = tcp_sock.recv(TCP_BUFFER)
     print(data)
+    packeta = packet_encode("UM", "\xca\xc5") # UDP port on the computer to receive UDP data from the mixer
+    packetb = packet_encode("JM", "{\"id\": \"Subscribe\", \"clientName\": \"Universal Control AI\", \"clientInternalName\": \"ucapp\", \"clientType\": \"PC\", \"clientDescription\": \"WASGE OC\", \"clientIdentifier\": \"WASGE-OC\", \"clientOptions\": \"perm users levl redu\", \"clientEncoding\": 23117}")
+    tcp_sock.send(packeta + packetb)
+    data = tcp_sock.recv(TCP_BUFFER)
+    print(data)
+    #packet = packet_encode("FR", "Listpresets/channel\x00\x00")
+    #tcp_sock.send(packet)
+    data = tcp_sock.recv(TCP_BUFFER)
+    #print(data)
     tcp_sock.close()
 
 udp_sock = udp_bind(UDP_IP, UDP_PORT)
