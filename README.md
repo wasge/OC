@@ -12,8 +12,10 @@ Then, someone pointed me to this great documentation https://github.com/featherb
 
 # My understandings about UCnet
 ## Packets and messages
-A network packet does not not always carry just one message. UC messages always start with 4 bytes: 0x55 0x43 0x00 0x01 (55 43 means UC). When my Windows app connected to my mixer, I noticed the 4 bytes were repeated on the same network packet. Then I noticed the same thing on some packets coming from the mixer, and also network packets without the four bytes. So I created a buffer, from which I read the messages.
+A network packet does not not always carry just one message. UC messages always start with 4 bytes: 0x55 0x43 0x00 0x01 (55 43 means UC). When my Windows app connected to my mixer, I noticed the 4 bytes were repeated on the same network packet. Then I noticed the same thing on some packets coming from the mixer, and also network packets without the four bytes.
+
+So a single network packet can carry multiple UCnet messages, and also a UC message can be too big for a single network packet. When I noticed this, I created a buffer where all the packets are stored, from which I find and read the UC messages, and then delete them.
 
 After the four bytes (U C 0x00 0x01) there are two bytes which represent the length in little endian. If a message is 8 bytes long, the two bytes would be 0x08 0x00. This two bytes don't include the own 4 bytes header and the 2 bytes length, so a 8 bytes long message would really be 14 bytes.
 
-All the packets are added to the buffer. If a header is found, the length is obtained from the two next bytes. If the length is shorter than the buffer, the message is sent to further processing and it is removed from the start of the buffer, leaving just the unprocessed messages. If the header length is shorter than the buffer, it does nothing and keeps receiving packages until all the remaining data arrives to the buffer.
+All the packets are added to the buffer. If a header is found, the length is obtained from the two next bytes. If the length is shorter than the buffer it means the full message should be in the buffer. In this case the message is sent to further processing and it is removed from the start of the buffer, leaving just the unprocessed messages. If the header length is larger than the buffer, it does nothing and keeps receiving packages until all the remaining data arrives to the buffer.
