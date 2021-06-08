@@ -32,3 +32,18 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 |:----:|:----:|:----:|:----:|:----:|
 |Mixer|0x68|0x00|0x65|0x00|
 |App|0x65|0x00|0x68|0x00|
+
+## Content types
+|Hexadecimal|Text|Meaning|
+|:----:|:----:|:----|
+|0x4a 0x4d|JM|JSON Message|
+||BO|(unknown)|
+||CK|(unknown)|
+||FR|(unknown)|
+||KA|Keep alive. Sent every second to the mixer.|
+||MS|Faders positions|
+||PL|Permissions list / device list.|
+||PR|(still unknown, appears when something is muted / unmuted)|
+||PS|(still unknown, appears when a channel or mix name is changed)|
+||PV|Parameter value.|
+||UM|UC Message. Sent when starting the connection, indicating the UDP port to receive level data.|
