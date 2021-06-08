@@ -19,3 +19,16 @@ So a single network packet can carry multiple UCnet messages, and also a UC mess
 After the four bytes (U C 0x00 0x01) there are two bytes which represent the length in little endian. If a message is 8 bytes long, the two bytes would be 0x08 0x00. This two bytes don't include the own 4 bytes header and the 2 bytes length, so a 8 bytes long message would really be 14 bytes.
 
 All the packets are added to the buffer. If a header is found, the length is obtained from the two next bytes. If the length is shorter than the buffer it means the full message should be in the buffer. In this case the message is sent to further processing and it is removed from the start of the buffer, leaving just the unprocessed messages. If the header length is larger than the buffer, it does nothing and keeps receiving packages until all the remaining data arrives to the buffer.
+
+## Messages
+Once connected to the mixer, each message always starts like this:
+|Header|Length, little endian|Content type|Four bytes|
+|:----:|:----:|:----:|:----:|
+|0x55 0x43 0x00 0x01|0x08 0x00|0x4a 0x4d|0x68 0x00 0x65 0x00|
+
+## Four Bytes
+Apparently, the four bytes have two bytes that change (the first and the third) and two bytes thad stay at 0x00 (the second and the fourth). Each time the console changes the values, the app seems to interchange the order of the two that changes.
+|Sender|Byte A|Byte B|Byte C|Byte D|
+|:----:|:----:|:----:|:----:|:----:|
+|Mixer|0x68|0x00|0x65|0x00|
+|App|0x65|0x00|0x68|0x00|
