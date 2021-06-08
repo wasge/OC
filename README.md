@@ -39,7 +39,7 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 |0x4a 0x4d|JM|JSON Message|
 ||BO|(unknown)|
 ||CK|(unknown)|
-||FR|(unknown)|
+||FR|(unknown, used to request data from the mixer)|
 ||KA|Keep alive. Sent every second to the mixer.|
 ||MS|Faders positions|
 ||PL|Permissions list / device list.|
