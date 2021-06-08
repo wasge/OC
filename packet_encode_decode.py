@@ -1,5 +1,4 @@
 import struct
-import json
 import sys
 
 def str2hex(s):
@@ -14,20 +13,12 @@ def hex2int(hex):
 	length = (lengtha * 256) + lengthb
 	return length
 
-def json_execute(content):
-	content = json.loads(content)
-	for id in content:
-		if (content["id"] == "SubscriptionReply"):
-			messageEncode("FR", "Listpresets/channel\x00\x00")
-		elif (content["id"] == "SubscriptionLost"):
-			sys.exit()
-
 def getLEnlength(length):
 	length = struct.pack('<H', length)
 	first, second = struct.unpack('>BB', length)
 	return chr(first) + chr(second)
 
-def messageEncode(type, content):
+def messageEncode(fourBytes, type, content):
 	# Header: \x55\x43\x00\x01 + Packet length in little endian
 	header = "UC\x00\x01"
 	# Packet: Type + \x68\x00\x65\x00 [+ json length in 4 bytes, little endian] + content
@@ -67,7 +58,7 @@ def messageDecode(content):
 			start = 16 # 4 first bytes + 2 little endian length bytes + 2 type bytes + 4bytes + 4 json length bytes = 16
 			end = 16 + length
 			print ("Received: JSON: %s" % (content[start:end]))
-			json_execute(content[start:end])
+			#json_execute(content[start:end])
 		elif (type == "PV"): # JSON content
 			start = 12 # 4 first bytes + 2 little endian length bytes + 2 type bytes + 4bytes = 12
 			end = 12 + length
@@ -91,6 +82,9 @@ def messageDecode(content):
 			print ("Received: BO.")
 		else:
 			print ("Received: %s." % (type))
+			start = 12 # 4 first bytes + 2 little endian length bytes + 2 type bytes + 4bytes = 12
+			end = 12 + length
+		return content[8:12], type, content[start:end]
 	else:
 		#print ("UC content NOT found: %s" % (content))
 		print ("UC content NOT found.")
