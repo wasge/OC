@@ -5,10 +5,25 @@ The main purpose of this project is enable the mixer to be controlled from this 
 
 This could allow multiple types of controllers, programming of scenes based on time or MIDI commands, remote controlling the preamps when the mixer is used as a Dante "digital snake" among other things.
 
-# How it was made
+## How it was made
 The main project has been done by inspecting the traffic between the official Universal Control app for Windows and the mixer, but there was some data that I could'nt understand, so I just copied and pasted some byte strings to mimic the app.
 
 Then, someone pointed me to this great documentation https://github.com/featherbear/presonus-studiolive-api/blob/documentation/PACKET.md so I made the messageEncode and messageDecode functions and no longer need to copy and paste bytes to mimic the original app.
+
+## Status
+* It is able to connect to the mixer. It appears on the official applications as one more device.
+* It is able to receive and store faders positions once any fader is moved, **not at the start** of the application.
+* It is **NOT able to move faders**
+
+## Files
+### wasge-oc.py
+It is the main program, basically the place where I'm doing all the tests. It has the config at the start of the file.
+
+It listens for dicovery broadcast UDP packages sent from the mixer. Then, when a mixer is detected (I'm guessing the code is wrong and may only detect my own mixer) it starts the TCP connection and starts the session.
+### packet_encode_decode.py
+Originally it had two functions, packet_encode and packet_decode. Since I discovered that the important things are the messages inside the packets, I renamed it to messageEncode and messageDecode. There are also some small functions to convert hexadecimal values to string or get the integer of a little endian value.
+### values_management.py
+This file creates the variables for the faders positions, updates it when requested by wasge-oc.py and returns the position of a given fader when requested.
 
 # My understandings about UCnet
 ## Packets and messages
@@ -42,7 +57,7 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 |0x46 0x44|FD|(unknown, seems to carry channel preset data)|
 |0x46 0x52|FR|(unknown, used to request data from the mixer)|
 |0x4b 0x41|KA|Keep alive. Sent every second to the mixer.|
-|0x4d 0x53|MS|Faders positions|
+|0x4d 0x53|MS|Faders positions. After the four bytes, each two bytes represent the fader position from channel 1 to 64.|
 |0x50 0x4c|PL|Permissions list / device list.|
 |0x50 0x52|PR|(still unknown, appears when something is muted / unmuted)|
 |0x50 0x53|PS|(still unknown, appears when a channel or mix name is changed)|
