@@ -139,6 +139,7 @@ def keepAlive(): # Send a keepAlive message every one second
 			if debugMessages:
 				print(">>> KeepAlive. fourBytes: %s" % (str2hex(fourBytes)))
 			lastKeepAlive = curTime
+			time.sleep(1)
 
 if __name__ == "__main__":
 	udp_sock = udp_bind(UDP_IP, UDP_PORT)
