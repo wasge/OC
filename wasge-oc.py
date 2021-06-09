@@ -4,6 +4,7 @@ import sys
 import threading
 import time
 from packet_encode_decode import messageEncode, messageDecode, getLEnlength, hex2int, str2hex
+from values_management import getVolume, updateVolumes
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 47809
@@ -97,14 +98,21 @@ def analyzeMessage(type, content):
 				tcp_sock.send(messagea + messageb)
 			elif (content["id"] == "SubscriptionReply"): # Ask for the presets list.
 				message = messageEncode(fourBytes, "FR", "Listpresets/channel\x00\x00")
-				#tcp_sock.send(message)
-				#print(">>> Listpresets/channel")
+				tcp_sock.send(message)
+				print(">>> Listpresets/channel")
 			elif (content["id"] == "SubscriptionLost"): # Lost Subscription, exit the program
 				sys.exit()
 	elif (type == "PL"):
-		message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\x27\x57\x10\x3f")
+		#message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\x27\x57\x10\x3f")
+		message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\xb9\x65\xc5\x3f")
+		tcp_sock.send(message)
+		print(">>> PV")
 		#tcp_sock.send(message)
 		#print(">>> PV main/ch/volume")
+	elif (type == "MS"):
+		updateVolumes(content[8:])
+		if debugMessages:
+			print("MS content: %s" % (str2hex(content[8:])))
 
 
 def mixer_connect(ip, port):
@@ -129,7 +137,7 @@ def mixer_connect(ip, port):
 	tcp_sock.close()
 
 def keepAlive(): # Send a keepAlive message every one second
-	global lastKeepAlive
+	global lastKeepAlive, tcp_sock
 	while True:
 		curTime = time.time()
 		if curTime - lastKeepAlive > 1.0:
