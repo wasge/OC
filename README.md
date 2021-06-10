@@ -13,7 +13,7 @@ Then, someone pointed me to this great documentation https://github.com/featherb
 ## Status
 * It is able to connect to the mixer. It appears on the official applications as one more device.
 * It is able to receive and store faders positions once any fader is moved, **not at the start** of the application.
-* It is **NOT able to move faders**
+* It is **STARTING TO BEING able to move faders**
 
 ## Files
 ### wasge-oc.py
