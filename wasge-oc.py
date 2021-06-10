@@ -103,8 +103,7 @@ def analyzeMessage(type, content):
 			elif (content["id"] == "SubscriptionLost"): # Lost Subscription, exit the program
 				sys.exit()
 	elif (type == "PL"):
-		#message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\x27\x57\x10\x3f")
-		message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\xb9\x65\xc5\x3f")
+		message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\xb9\x65\xc5\x3f") # MOVE THE MAIN FADER! FINALLY!!!
 		tcp_sock.send(message)
 		print(">>> PV")
 		#tcp_sock.send(message)
