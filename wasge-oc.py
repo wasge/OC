@@ -1,15 +1,24 @@
 import json
+import select
 import socket
 import sys
 import threading
 import time
 from packet_encode_decode import messageEncode, messageDecode, getLEnlength, hex2int, str2hex
 from values_management import getVolume, updateVolumes
+from oscInterface import analyzeOSC
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 47809
 UDP_BUFFER = 1024
+
 TCP_BUFFER = 4096
+TCP_IP = "0.0.0.0"
+TCP_PORT = 0
+
+OSC_ENABLE = False
+OSC_IP = "0.0.0.0"
+OSC_PORT = 8088
 
 fourBytesA = "\x68"
 fourBytesC = "\x65"
@@ -55,7 +64,6 @@ def fourBytesUpdater(fourBytes):
 	# Just set the two bytes when received
 	fourBytesA = fourBytes[0:1]
 	fourBytesC = fourBytes[2:3]
-	#print str2hex(fourBytesA + "\x00" + fourBytesC + "\x00")
 
 def fourBytesGenerator():
 	# Interchange the two non-zero fourBytes
@@ -102,10 +110,11 @@ def analyzeMessage(type, content):
 				print(">>> Listpresets/channel")
 			elif (content["id"] == "SubscriptionLost"): # Lost Subscription, exit the program
 				sys.exit()
-	elif (type == "PL"):
-		message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\xb9\x65\xc5\x3f") # MOVE THE MAIN FADER! FINALLY!!!
-		tcp_sock.send(message)
-		print(">>> PV")
+	#elif (type == "PL"):
+		#message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\xb9\x65\xc5\x3f") # MOVE THE MAIN FADER! FINALLY!!!
+		#message = messageEncode(fourBytes, "PV", "main/ch1/volume\x00\x00\x00\x03\x25\x3c\x3f") # MOVE THE MAIN FADER! FINALLY!!!
+		#tcp_sock.send(message)
+		#print(">>> PV")
 		#tcp_sock.send(message)
 		#print(">>> PV main/ch/volume")
 	elif (type == "MS"):
@@ -113,25 +122,39 @@ def analyzeMessage(type, content):
 		if debugMessages:
 			print("MS content: %s" % (str2hex(content[8:])))
 
+def doThing(command, value):
+	global tcp_sock
+	#fullvalue = "main/ch1/volume\x00\x00\x00\x03\x25\x3c\x3f"
+	fullvalue = (command[1:] + "\x00\x00\x00" + value) # Remove the first "/" with command[1:]
+	print (">>> PV: %s" % str2hex(value))
+	fourBytes = fourBytesGenerator()
+	message = messageEncode(fourBytes, "PV", fullvalue)
+	tcp_sock.send(message)
 
 def mixer_connect(ip, port):
-	global tcp_sock
-	print("Trying to connect to %s:%s" % (ip, port))
-	tcp_sock = tcp_connect(ip, port)
+	global tcp_sock, osc_sock, TCP_IP, TCP_PORT
+	TCP_IP = ip
+	TCP_PORT = port
+	print("Trying to connect to %s:%s" % (TCP_IP, TCP_PORT))
+	tcp_sock = tcp_connect(TCP_IP, TCP_PORT) # Start the connection to the mixer
+	osc_sock = udp_bind(OSC_IP, OSC_PORT) # Start the OSC binding
 	fourBytes = fourBytesGenerator()
 	packet = messageEncode(fourBytes, "JM", "{\"id\": \"QuerySlave\"}")
 	print(">>> QuerySlave")
 	tcp_sock.send(packet)
-	# Create the keepAlive Trhead and start it
-	keepThread = threading.Thread(target=keepAlive)
+	keepThread = threading.Thread(target=keepAlive) #Create the keepAlive Trhead and start it
 	keepThread.daemon = True
 	keepThread.start()
-	#packet = messageEncode("FR", "Listpresets/channel\x00\x00")
-	#packet = messageEncode("PV", "main/ch1/volume\x00\x00\x00\x27\x57\x10\x3f")
-	#tcp_sock.send(packet)
+	empty = []
 	while MIXER_CONNECTED == True:
-		data = tcp_sock.recv(TCP_BUFFER)
-		message_search(data)
+		readable, writable, exceptional = select.select((tcp_sock, osc_sock), empty, empty) # Select data from both sockets
+		for s in readable:
+			data, address = s.recvfrom(TCP_BUFFER)
+			if (address == None): # It is the TCP connection
+				message_search(data)
+			else: # It is the OSC bind
+				command, value = analyzeOSC(data)
+				doThing(command, value)
 	print ("Exit")
 	tcp_sock.close()
 
