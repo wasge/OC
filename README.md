@@ -5,15 +5,21 @@ The main purpose of this project is enable the mixer to be controlled from this 
 
 This could allow multiple types of controllers, programming of scenes based on time or MIDI commands, remote controlling the preamps when the mixer is used as a Dante "digital snake" among other things.
 
+## Status
+* It is able to connect to the mixer. It appears on the official applications as one more device.
+* It is able to receive and store faders positions once any fader is moved, **not at the start** of the application.
+* It is able to receive OSC messages.
+* **It is able to move faders when receiving OSC messages.**
+
 ## How it was made
 The main project has been done by inspecting the traffic between the official Universal Control app for Windows and the mixer, but there was some data that I could'nt understand, so I just copied and pasted some byte strings to mimic the app.
 
 Then, someone pointed me to this great documentation https://github.com/featherbear/presonus-studiolive-api/blob/documentation/PACKET.md so I made the messageEncode and messageDecode functions and no longer need to copy and paste bytes to mimic the original app.
 
-## Status
-* It is able to connect to the mixer. It appears on the official applications as one more device.
-* It is able to receive and store faders positions once any fader is moved, **not at the start** of the application.
-* It is **STARTING TO BEING able to move faders**
+## Open Sound Control
+The project has a very basic working OSC implementation, only capable of receiving fader information and sending it to the mixer. It does **not** sends back to the OSC client the movement of the faders made from other UC Surface apps or CS18 controllers.
+
+It accepts OSC messages, without main URL address, and with addresses /main/ch1/volume or /line/ch1/volume to /line/ch32/volume and receives data from 0 (minimum value) to 1 (maximum value) in two's complement 32 bit format.
 
 ## Files
 ### wasge-oc.py
