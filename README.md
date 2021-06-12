@@ -19,7 +19,7 @@ Then, someone pointed me to this great documentation https://github.com/featherb
 ## Open Sound Control
 The project has a very basic working OSC implementation, only capable of receiving fader information and sending it to the mixer. It does **not** sends back to the OSC client the movement of the faders made from other UC Surface apps or CS18 controllers.
 
-It accepts OSC messages, without main URL address, and with addresses /main/ch1/volume or /line/ch1/volume to /line/ch32/volume and receives data from 0 (minimum value) to 1 (maximum value) in two's complement 32 bit format.
+It accepts OSC messages, without main URL address, and with addresses /main/ch1/volume or /line/ch1/volume to /line/ch32/volume and receives data from 0 (minimum value) to 1 (maximum value) in 32 bit two's complement signed integer.
 
 ## Files
 ### wasge-oc.py
