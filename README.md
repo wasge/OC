@@ -68,4 +68,4 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 |0x50 0x52|PR|(still unknown, appears when something is muted / unmuted)|
 |0x50 0x53|PS|(still unknown, appears when a channel or mix name is changed)|
 |0x50 0x56|PV|Parameter value.|
-|0x55 0x4d|UM|UC Message. Sent when starting the connection, indicating the UDP port to receive level data.|
+|0x55 0x4d|UM|UDP port opened on the app to receive channels levels data. Example: 0xCA 0xC5 in little endian means C5CA = port 50634.|
