@@ -11,6 +11,10 @@ This could allow multiple types of controllers, programming of scenes based on t
 * It is able to receive OSC messages.
 * **It is able to move faders when receiving OSC messages.**
 
+This application needs Python 2 (yes, I know it's discontinued, but I didn't knew it wen I started the project).
+
+It also needs to open the UDP port 47809 to listen for discovery messages from available mixers. The app "UC Surface" and the Windows service "Presonus Hardware Access Service" needs to be closed, as they are using (and thus blocking) the port.
+
 ## How it was made
 The main project has been done by inspecting the traffic between the official Universal Control app for Windows and the mixer, but there was some data that I could'nt understand, so I just copied and pasted some byte strings to mimic the app.
 
