@@ -73,3 +73,29 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 |0x50 0x53|PS|(still unknown, appears when a channel or mix name is changed)|
 |0x50 0x56|PV|Parameter value.|
 |0x55 0x4d|UM|UDP port opened on the app to receive channels levels data. Example: 0xCA 0xC5 in little endian means C5CA = port 50634.|
+
+## PV contents
+The mixer is organized like an analog mixer, not like a digital one. The aux sends are part of each channel.
+|Parameter|Name|Comments|
+|:---:|:---:|:---:|
+|Main mix > volume|main/ch1/volume|Main mix, although being a stereo channel, is referred to just ch1|
+|Mono out > Mute on/off|mono/ch1/mute|If the main mix is set to LCR (instead of LR + mono) it works exactly the same, it is still called mono/ch1|
+|Channel 1 > Preamp gain|line/ch1/preampgain||
+|Channel 1 > High pass filter|line/ch1/filter/hpf||
+|Channel 1 > Phantom power on/off|line/ch1/48v||
+|Channel 1 > Inverse polarity on/off|line/ch1/polarity||
+|Channel 1 > Route to Main mix on/off|line/ch1/lr||
+|Channel 1 > Route to Mono mix on/off|line/ch1/mono||
+|Channel 1 > Mute on/off|line/ch1/mute||
+|Channel 1 > Solo on/off|line/ch1/solo||
+|Channel 1 > Pan|line/ch1/pan||
+|Channel 1 > Gate on/off|line/ch1/gate/on||
+|Channel 1 > Compressor on/off|line/ch1/comp/on||
+|Channel 1 > Equalizer on/off|line/ch1/eq/eqallon||
+|Channel 1 > Limiter on/off|line/ch1/limit/limiteron||
+|Channel 1 > Send to FX A|line/ch1/FXA||
+|Channel 1 > Send to Aux 1 > level|line/ch1/aux1||
+|Channel 1 > Send to Aux 1+2 > pan|line/ch1/aux12_pan|Aux 12 (an even number) is aux 1+2, it cannot be aux 12, as it would mean it also exist aux 11, so it will be a mono aux so it can't have pan.|
+|Channel 1 > Send to Aux 15+16 > pan|line/ch1/aux1516_pan||
+|Aux Mix 1 > Main output|aux/ch1/volume||
+|Aux Mix 1 > Stereo link with Aux Mix 2|aux/ch12/link|It is Aux 1+2. It cannot be aux 12, as it would be aux 11 + 12, not just 12 alone|
