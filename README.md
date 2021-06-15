@@ -23,7 +23,7 @@ Then, someone pointed me to this great documentation https://github.com/featherb
 ## Open Sound Control
 The project has a very basic working OSC implementation, only capable of receiving fader information and sending it to the mixer. It does **not** sends back to the OSC client the movement of the faders made from other UC Surface apps or CS18 controllers.
 
-It accepts OSC messages, without main URL address, and with addresses /main/ch1/volume or /line/ch1/volume to /line/ch32/volume and receives data from 0 (minimum value) to 1 (maximum value) in 32 bit two's complement signed integer.
+It accepts OSC messages, without main URL address, and with addresses /main/ch1/volume or /line/ch1/volume to /line/ch32/volume and receives data from 0 (minimum value) to 1 (maximum value) in little endian 32 bits floating point.
 
 ## Files
 ### wasge-oc.py
@@ -76,26 +76,26 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 
 ## PV contents
 The mixer is organized like an analog mixer, not like a digital one. The aux sends are part of each channel.
-|Parameter|Name|Comments|
-|:---:|:---:|:---:|
-|Main mix > volume|main/ch1/volume|Main mix, although being a stereo channel, is referred to just ch1|
-|Mono out > Mute on/off|mono/ch1/mute|If the main mix is set to LCR (instead of LR + mono) it works exactly the same, it is still called mono/ch1|
-|Channel 1 > Preamp gain|line/ch1/preampgain||
-|Channel 1 > High pass filter|line/ch1/filter/hpf||
-|Channel 1 > Phantom power on/off|line/ch1/48v||
-|Channel 1 > Inverse polarity on/off|line/ch1/polarity||
-|Channel 1 > Route to Main mix on/off|line/ch1/lr||
-|Channel 1 > Route to Mono mix on/off|line/ch1/mono||
-|Channel 1 > Mute on/off|line/ch1/mute||
-|Channel 1 > Solo on/off|line/ch1/solo||
-|Channel 1 > Pan|line/ch1/pan||
-|Channel 1 > Gate on/off|line/ch1/gate/on||
-|Channel 1 > Compressor on/off|line/ch1/comp/on||
-|Channel 1 > Equalizer on/off|line/ch1/eq/eqallon||
-|Channel 1 > Limiter on/off|line/ch1/limit/limiteron||
-|Channel 1 > Send to FX A|line/ch1/FXA||
-|Channel 1 > Send to Aux 1 > level|line/ch1/aux1||
-|Channel 1 > Send to Aux 1+2 > pan|line/ch1/aux12_pan|Aux 12 (an even number) is aux 1+2, it cannot be aux 12, as it would mean it also exist aux 11, so it will be a mono aux so it can't have pan.|
-|Channel 1 > Send to Aux 15+16 > pan|line/ch1/aux1516_pan||
-|Aux Mix 1 > Main output|aux/ch1/volume||
-|Aux Mix 1 > Stereo link with Aux Mix 2|aux/ch12/link|It is Aux 1+2. It cannot be aux 12, as it would be aux 11 + 12, not just 12 alone|
+|Parameter|Name|Value|Comments|
+|:---|:---|:---|:---|
+|Main mix > volume|main/ch1/volume|0 (`0x00 0x00 0x00 0x00`) to 1 (`0x00 0x00 0x80 0x3F`) in little endian 32 bits floating point|Main mix, although being a stereo channel, is referred to just ch1|
+|Mono out > Mute on/off|mono/ch1/mute|`0x00 0x00 0x80 0x3F` = mute on (no sound passing) / `0x00 0x00 0x00 0x00` = mute off (sound passes through)|If the main mix is set to LCR (instead of LR + mono) it works exactly the same, it is still called mono/ch1|
+|Channel 1 > Preamp gain|line/ch1/preampgain|||
+|Channel 1 > High pass filter|line/ch1/filter/hpf|||
+|Channel 1 > Phantom power on/off|line/ch1/48v|||
+|Channel 1 > Inverse polarity on/off|line/ch1/polarity|||
+|Channel 1 > Route to Main mix on/off|line/ch1/lr|||
+|Channel 1 > Route to Mono mix on/off|line/ch1/mono|||
+|Channel 1 > Mute on/off|line/ch1/mute|||
+|Channel 1 > Solo on/off|line/ch1/solo|||
+|Channel 1 > Pan|line/ch1/pan|||
+|Channel 1 > Gate on/off|line/ch1/gate/on|||
+|Channel 1 > Compressor on/off|line/ch1/comp/on|||
+|Channel 1 > Equalizer on/off|line/ch1/eq/eqallon|||
+|Channel 1 > Limiter on/off|line/ch1/limit/limiteron|||
+|Channel 1 > Send to FX A|line/ch1/FXA|||
+|Channel 1 > Send to Aux 1 > level|line/ch1/aux1|||
+|Channel 1 > Send to Aux 1+2 > pan|line/ch1/aux12_pan||Aux 12 (an even number) is aux 1+2, it cannot be aux 12, as it would mean it also exist aux 11, and both of them would be mono auxes so they can't have pan.|
+|Channel 1 > Send to Aux 15+16 > pan|line/ch1/aux1516_pan|||
+|Aux Mix 1 > Main output|aux/ch1/volume|0 to 1 in little endian 32 bits floating point||
+|Aux Mix 1 > Stereo link with Aux Mix 2|aux/ch12/link||It is Aux 1+2. It cannot be aux 12, as it would be aux 11 + 12, not just 12 alone|
