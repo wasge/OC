@@ -61,16 +61,17 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 ## Content types
 |Hexadecimal|Text|Meaning|
 |:----:|:----:|:----|
-|0x4a 0x4d|JM|JSON Message|
 |0x42 0x4f|BO|(unknown)|
 |0x43 0x4b|CK|(unknown)|
 |0x46 0x44|FD|(unknown, seems to carry channel preset data)|
 |0x46 0x52|FR|(unknown, used to request data from the mixer)|
+|0x4a 0x4d|JM|JSON Message|
 |0x4b 0x41|KA|Keep alive. Sent every second to the mixer.|
 |0x4d 0x53|MS|Faders positions. After the four bytes, each two bytes represent the fader position from channel 1 to 64.|
+|0x4a 0x4d|PC|(unknown, seems to change when changing the colour of a channel)|
 |0x50 0x4c|PL|Permissions list / device list.|
-|0x50 0x52|PR|(still unknown, appears when something is muted / unmuted)|
-|0x50 0x53|PS|(still unknown, appears when a channel or mix name is changed)|
+|0x50 0x52|PR|(unknown, appears when something is muted / unmuted)|
+|0x50 0x53|PS|(unknown, appears when a channel or mix name is changed)|
 |0x50 0x56|PV|Parameter value.|
 |0x55 0x4d|UM|UDP port opened on the app to receive channels levels data. Example: 0xCA 0xC5 in little endian means C5CA = port 50634.|
 
