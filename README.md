@@ -29,7 +29,7 @@ It accepts OSC messages, without main URL address, and with addresses `/main/ch1
 ### wasge-oc.py
 It is the main program, basically the place where I'm doing all the tests. It has the config at the start of the file.
 
-It listens for dicovery broadcast UDP packages sent from the mixer. Then, when a mixer is detected (I'm guessing the code is wrong and may only detect my own mixer) it starts the TCP connection and starts the session.
+It listens for dicovery broadcast UDP packages sent from the mixer. Then, when a mixer is detected it automatically starts the TCP connection and starts the session.
 ### packet_encode_decode.py
 Originally it had two functions, packet_encode and packet_decode. Since I discovered that the important things are the messages inside the packets, I renamed it to messageEncode and messageDecode. There are also some small functions to convert hexadecimal values to string or get the integer of a little endian value.
 ### values_management.py
