@@ -49,10 +49,9 @@ def read_udp(data, addr):
     if data[0:2] == "UC":
         print("Data received from a mixer")
         # UC found, try to search the name
-        start = data.find("\xb7")
+        start = data.find("Studio")
         if start > -1:
-            start = start + 1
-            end = data.find("\x2f")
+            end = data.find("\x00", start)
             name = data[start:end]
             print("%s found at %s:%s" % (name,ip,port))
             UDP_SEARCHING = False
