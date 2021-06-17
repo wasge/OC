@@ -1,6 +1,7 @@
 import json
 import select
 import socket
+import struct
 import sys
 import threading
 import time
@@ -69,7 +70,7 @@ def fourBytesGenerator():
 	string = fourBytesC + "\x00" + fourBytesA + "\x00"
 	return string
 
-def message_search(packet): # There are multiple messages per packet
+def message_search(packet): # There might be multiple UCnet messages per packet
 	global packet_buffer # And messages on multiple packets, so we need a buffer
 	searching = True
 	searchPos = 0
@@ -91,6 +92,21 @@ def message_search(packet): # There are multiple messages per packet
 			messagePos = 0
 		else:
 			searching = False
+
+def OSC_search(data): # There might be multiple OSC messages (a bundle) in a single packet
+	if (data[0:8] == "#bundle\x00"):
+		osc_buffer = data[16:] # Remove the first 8 bytes: #buffer\x00 + the next 8 bytes: the OSC timetag
+		while (len(osc_buffer) > 4):
+			length = osc_buffer[0:4] # OSC message length, 32 bit int
+			length = struct.unpack('>i', length)[0]
+			length = length + 4 # Add the length of 4 bytes indicating the length
+			data = osc_buffer[4:length] # Remove the length from the data
+			command, value = analyzeOSC(data)
+			doThing(command, value)
+			osc_buffer = osc_buffer[length:] # Remove this chunk from the buffer
+	else:
+		command, value = analyzeOSC(data)
+		doThing(command, value)
 
 def analyzeMessage(type, content):
 	global tcp_sock
@@ -125,7 +141,7 @@ def doThing(command, value):
 	global tcp_sock
 	#fullvalue = "main/ch1/volume\x00\x00\x00\x03\x25\x3c\x3f"
 	fullvalue = (command[1:] + "\x00\x00\x00" + value) # Remove the first "/" with command[1:]
-	print (">>> PV: %s" % str2hex(value))
+	print (">>> PV: Command: %s Value:%s" % (command[1:], str2hex(value)))
 	fourBytes = fourBytesGenerator()
 	message = messageEncode(fourBytes, "PV", fullvalue)
 	tcp_sock.send(message)
@@ -150,10 +166,9 @@ def mixer_connect(ip, port):
 		for s in readable:
 			data, address = s.recvfrom(TCP_BUFFER)
 			if (address == None): # It is the TCP connection
-				message_search(data)
+				message_search(data) # Search for UCnet messages on the packet
 			else: # It is the OSC bind
-				command, value = analyzeOSC(data)
-				doThing(command, value)
+				OSC_search(data) # Search for OSC messages on the packet
 	print ("Exit")
 	tcp_sock.close()
 
