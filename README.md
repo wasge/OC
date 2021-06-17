@@ -23,7 +23,7 @@ Then, someone pointed me to this great documentation https://github.com/featherb
 ## Open Sound Control
 The project has a very basic working OSC implementation, only capable of receiving fader information and sending it to the mixer. It does **not** sends back to the OSC client the movement of the faders made from other UC Surface apps or CS18 controllers.
 
-It accepts OSC messages, without main URL address, and with addresses /main/ch1/volume or /line/ch1/volume to /line/ch32/volume and receives data from 0 (minimum value) to 1 (maximum value) in little endian 32 bits floating point.
+It accepts OSC messages, without main URL address, and with addresses `/main/ch1/volume` or `/line/ch1/volume` to `/line/ch32/volume` and receives data from 0 (minimum value) to 1 (maximum value) in little endian 32 bits floating point.
 
 ## Files
 ### wasge-oc.py
@@ -33,7 +33,7 @@ It listens for dicovery broadcast UDP packages sent from the mixer. Then, when a
 ### packet_encode_decode.py
 Originally it had two functions, packet_encode and packet_decode. Since I discovered that the important things are the messages inside the packets, I renamed it to messageEncode and messageDecode. There are also some small functions to convert hexadecimal values to string or get the integer of a little endian value.
 ### values_management.py
-This file creates the variables for the faders positions, updates it when requested by wasge-oc.py and returns the position of a given fader when requested.
+This file creates the variables for the faders positions, updates it when requested by wasge-oc.py and returns the position of a given fader when requested. It also converts the 16 bit little endian fader position (0 - 65535) to floating point (0 - 1) to match the rest of the values sent to the mixer.
 
 # My understandings about UCnet
 ## Packets and messages
@@ -67,7 +67,7 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 |0x46 0x52|FR|(unknown, used to request data from the mixer)|
 |0x4a 0x4d|JM|JSON Message|
 |0x4b 0x41|KA|Keep alive. Sent every second to the mixer.|
-|0x4d 0x53|MS|Faders positions. After the four bytes, each two bytes represent the fader position from channel 1 to 64.|
+|0x4d 0x53|MS|Faders positions. After the four bytes, each two bytes in little endian (from 0 to 65535) represent the fader position from channel 1 to 64. The next is the main fader. The next is unknown. The next is the mono fader.|
 |0x4a 0x4d|PC|(unknown, seems to change when changing the colour of a channel)|
 |0x50 0x4c|PL|Permissions list / device list.|
 |0x50 0x52|PR|(unknown, appears when something is muted / unmuted)|
