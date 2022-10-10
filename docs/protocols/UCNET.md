@@ -1,4 +1,4 @@
-# My understandings about UCnet
+# My understandings about UCNET
 ## Packets and messages
 A network packet does not not always carry just one message. UC messages always start with 4 bytes: 0x55 0x43 0x00 0x01 (55 43 means UC). When my Windows app connected to my mixer, I noticed the 4 bytes were repeated on the same network packet. Then I noticed the same thing on some packets coming from the mixer, and also network packets without the four bytes.
 
