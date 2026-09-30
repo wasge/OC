@@ -37,7 +37,7 @@ Apparently, the four bytes have two bytes that change (the first and the third) 
 |0x50 0x53|PS|(unknown, appears when a channel or mix name is changed)|
 |0x50 0x56|PV|Parameter value.|
 |0x55 0x4d|UM|UDP port opened on the app to receive channels levels data. Example: 0xCA 0xC5 in little endian means C5CA = port 50634.|
-|0x5a 0x4d|JM|ZIP message containing a JSON Message. The first one contains the full description of the current status of the mixer.|
+|0x5a 0x4d|ZM|ZIP message containing a JSON Message. The first one contains the full description of the current status of the mixer.|
 
 ## PV contents
 The mixer is organized like an analog mixer, not like a digital one. The aux sends are part of each channel.
