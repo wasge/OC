@@ -13,6 +13,7 @@ Once connected to the mixer, each message always starts like this:
 |Header|Length, little endian|Content type|Four bytes|
 |:----:|:----:|:----:|:----:|
 |0x55 0x43 0x00 0x01|0x08 0x00|0x4a 0x4d|0x68 0x00 0x65 0x00|
+|U C 0x00 0x01|8 0 (8 bytes)|J M (JSON message)|Four bytes
 
 ## Four Bytes
 Apparently, the four bytes have two bytes that change (the first and the third) and two bytes thad stay at 0x00 (the second and the fourth). Each time the console changes the values, the app seems to interchange the order of the two that changes.
